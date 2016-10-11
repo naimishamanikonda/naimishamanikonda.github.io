@@ -75,28 +75,23 @@ body {
 <input type="checkbox" id="national-unemp" checked=true onclick="toggleNational(this)">National<br>
 <button type="button" id="selectAll" onclick="toggleSelectedAll(this)">selectall<br>
 <button type="button" id="clearAll" onclick="clearAll(this)">clearall<br>
+<div class="container" id="chart1">
+</div>
+<div class="container" id="chart2">
+</div>
 <script type="text/javascript">
 
-/*  This visualization was made possible by modifying code provided by:
-
-Scott Murray, Choropleth example from "Interactive Data Visualization for the Web" 
-https://github.com/alignedleft/d3-book/blob/master/chapter_12/05_choropleth.html   
-		
-Malcolm Maclean, tooltips example tutorial
-http://www.d3noob.org/2013/01/adding-tooltips-to-d3js-graph.html
-
-Mike Bostock, Pie Chart Legend
-http://bl.ocks.org/mbostock/3888852  */
 
 		
 //Width and height of map
+var color2 = ["#48A36D",  "#56AE7C",  "#64B98C", "#72C39B", "#80CEAA", "#80CCB3", "#7FC9BD", "#7FC7C6", "#7EC4CF", "#7FBBCF", "#7FB1CF", "#80A8CE", "#809ECE", "#8897CE", "#8F90CD", "#9788CD", "#9E81CC", "#AA81C5", "#B681BE"];	
 var d;
 var parseDate = d3.time.format("%d-%b-%y").parse;
 var parseDate2 = d3.time.format("%B-%Y").parse;
 var id;
 var jsonState;
-var mapwidth = 1200;
-var mapheight = 700;
+var mapwidth = 500;
+var mapheight = 500;
 var json1;
 var dataState;
 // D3 Projection
@@ -107,8 +102,8 @@ var dataNational=[];
  var dataArray = [];
  var dataAll=[];
 var projection = d3.geo.albersUsa()
-				   .translate([1000,100 ])    // translate to center of screen
-				   .scale([470]);          // scale things down so see entire US
+				   .translate([275,96 ])    // translate to center of screen
+				   .scale([450]);          // scale things down so see entire US
         
 // Define path generator
 var path = d3.geo.path()               // path generator that will convert GeoJSON to SVG paths
@@ -118,7 +113,7 @@ var path = d3.geo.path()               // path generator that will convert GeoJS
 // Define linear scale for output
 var color = d3.scale.category20();
 // Set the dimensions of the canvas / graph
-var margin = {top: 35, right: 10, bottom: 100, left: 470},
+var margin = {top: 40, right: 10, bottom: 100, left: 470},
     margin2 ={top: 300, right: 10, bottom: 30, left: 470},
     width = 950- margin.left - margin.right,
     height = 370 - 15 - margin.bottom,
@@ -128,6 +123,7 @@ var parseDate = d3.time.format("%d-%b-%y").parse;
 var parseDate2 = d3.time.format("%B-%Y").parse;
 
 // Set the ranges
+
 var x = d3.time.scale().range([0, width]);
 var x2 = d3.time.scale().range([0, width]);
 var y = d3.scale.linear().range([height, 0]);
@@ -163,11 +159,12 @@ var valueline = d3.svg.line()
 // Adds the svg canvas
 var svg = d3.select("body")
     .append("svg")
-        .attr("width", width + margin.left + margin.right)
+        .attr("width", 700 )
         .attr("height", height + margin.top + margin.bottom)
     .append("g")
         .attr("transform", 
-              "translate(" + 20 + "," + 30 + ")");
+              "translate(" + 20 + "," + 30 + ")")
+		.attr("id","chart2");
  //var color = d3.scale.ordinal().range(["#0a72ff", "#1eff06"]);
 //var legendText = ["1", "2", "3", "4","5","6","8","9","10","11","12"];
 var context = svg.append("g")
@@ -183,7 +180,8 @@ svg.append("defs").append("clipPath")
 var mapsvg = d3.select("body")
 			.append("svg")
 			.attr("width", mapwidth)
-			.attr("height", mapheight);
+			.attr("height", mapheight)
+			.attr("id","chart1");
  //var checksvg = d3.append("svg").attr("width", 50).attr("height", 30),
  //checkBox = new d3CheckBox(); 
 // Append Div for tooltip to SVG
@@ -286,7 +284,7 @@ d3.csv("data.csv", function(data) {
 	// text label for the x axis
 	    .attr("transform", "rotate(-90)")
         .attr("x",0)
-        .attr("y",9)
+        .attr("y",10)
         .style("text-anchor", "middle")
         .text("Unemployment(%)");
 
@@ -345,7 +343,7 @@ d3.csv("data.csv", function(data) {
 			
 			.style("stroke", "#fff")
 			.style("stroke-width", "1")//remove this .style fill part and comment bellow
-			.style("fill", "red")
+			.style("fill", "#BDC3C7  ")
 			.on("mouseover", function(d) {
 			div.transition()        
 				   .duration(200)      
@@ -399,7 +397,7 @@ d3.csv("data.csv", function(data) {
       .attr("transform", "translate(0," + height2 + ")")
       .call(xAxis2);
 	context.append("rect")
-	.attr("fill","yellow")
+	.attr("fill","#d5d8d1")
 	.attr("height",height2)
 	.attr("width",width)
 context.append("g")
@@ -440,11 +438,12 @@ context.append("g")
 		 })  
 		 svg.append("path")
 		.attr("class", "national")
-		.attr("stroke-width",4)
+		.attr("stroke-width",6)
 		.attr("stroke","violet")
 		.attr("id", "blueLine")
 		.attr("d",valueline(dataNational))
-		;
+		.append("title")
+        .text("national");
   
 		});
 	});
@@ -457,13 +456,13 @@ context.append("g")
 			if(statename==selectedarray[i]){
 			bexist=true;
 			selectedarray.splice(i,1);
-			//d3.selected(this).style("fill",blue)
-			e.style("fill","red");
+			//d3.selected(this).style("fill",#DAF7A6)
+			e.style("fill","#BDC3C7");
 				}
 			}
 		if(!bexist){
 		selectedarray.push(statename);
-		e.style("fill","blue");
+		e.style("fill","#DAF7A6");
 		
 		}
 	}
@@ -500,7 +499,7 @@ context.append("g")
 		mapsvg.selectAll("path")
 			.style("stroke", "#fff")
 			.style("stroke-width", "1")//remove this .style fill part and comment bellow
-			.style("fill", "blue")
+			.style("fill", "#DAF7A6")
 		}
 		
 	}
@@ -514,7 +513,7 @@ context.append("g")
 		mapsvg.selectAll("path")
 			.style("stroke", "#fff")
 			.style("stroke-width", "1")//remove this .style fill part and comment bellow
-			.style("fill", "red")
+			.style("fill", "#BDC3C7  ")
 		
 		}
 		
@@ -577,8 +576,3 @@ function type(d) {
 
 </body>
 </html>
-
-
-
-
-
