@@ -7,6 +7,9 @@
 <style type="text/css">
 
 /* On mouse hover, lighten state color */
+.container {
+  float: left;
+}
 path:hover {
 	fill-opacity: .7;
 }
@@ -101,6 +104,34 @@ var value;
 var dataNational=[];
  var dataArray = [];
  var dataAll=[];
+ 
+var avgs= [{"state":"Alaska", "avg": 7.4},{"state":"Alabama", "avg":8.11},
+{"state":"Delaware", "avg": 5.5},{"state":"Arizona", "avg":6.4},
+{"state":"District of Columbia", "avg": 7.8},{"state":"Arkansas", "avg":6.7},
+{"state":"Georgia", "avg": 6.3},{"state":"California", "avg":5.6},
+{"state":"Florida", "avg": 6.11},{"state":"Colorado", "avg":5.5},
+{"state":"Iowa", "avg": 4.7},{"state":"Hawaii", "avg":5.0},
+{"state":"Kansas", "avg": 4.7},{"state":"Idaho", "avg":6.11},
+{"state":"Kentucky", "avg": 6.9},{"state":"Illinois", "avg":7.1},
+{"state":"Louisiana", "avg": 7.4},{"state":"Indiana", "avg":6.4},
+{"state":"Mississippi", "avg": 7.4},{"state":"Maine", "avg":6.0},
+{"state":"Missouri", "avg": 7.7},{"state":"Maryland", "avg":5.4},
+{"state":"Montana", "avg": 6.1},{"state":"Massachusetts", "avg":5.7},
+{"state":"Nebraska", "avg": 5.9},{"state":"Michigan", "avg":8.2},
+{"state":"Nevada", "avg": 3.6},{"state":"Minnesota", "avg":5.0},
+{"state":"New Hampshire", "avg": 4.4},{"state":"Oklahoma", "avg":5.3},
+{"state":"New Jersey", "avg": 6.6},{"state":"Oregon", "avg":6.5},
+{"state":"New Mexico", "avg": 6.9},{"state":"Pennsylvania", "avg":5.7},
+{"state":"New York", "avg": 6.7},{"state":"Rhode Island", "avg":6.7},
+{"state":"North Carolina", "avg": 5.96},{"state":"South Carolina", "avg":6.70},
+{"state":"North Dakota", "avg": 3.9},{"state":"South Dakota", "avg":3.7},
+{"state":"Ohio", "avg": 6.9},{"state":"Tennessee", "avg":6.6},
+{"state":"Texas", "avg": 6.1},{"state":"Washington", "avg":7.2},
+{"state":"Utah", "avg": 5.0},{"state":"West Virginia", "avg":8.4},
+{"state":"Virginia", "avg": 4.1},{"state":"Wisconsin", "avg":5.76},
+{"state":"Vermont", "avg": 4.1},{"state":"Puerto Rico", "avg":14.6},
+{"state":"Wyoming", "avg":5.6}
+];
 var projection = d3.geo.albersUsa()
 				   .translate([275,96 ])    // translate to center of screen
 				   .scale([450]);          // scale things down so see entire US
@@ -122,6 +153,10 @@ var margin = {top: 40, right: 10, bottom: 100, left: 470},
 var parseDate = d3.time.format("%d-%b-%y").parse;
 var parseDate2 = d3.time.format("%B-%Y").parse;
 
+
+//define line and state color
+var lineColor;
+var stateName;
 // Set the ranges
 
 var x = d3.time.scale().range([0, width]);
@@ -231,6 +266,9 @@ d3.csv("data.csv", function(data) {
       .data(dataArray).enter()
       .append("path")
 	  .attr("class","line")
+	  .attr("id",(function(d) {
+        return d[0].State;
+        }))
 	  .attr("stroke-width",1)
       .attr("stroke", function(d){
           return color(d[0].State);})
@@ -301,15 +339,17 @@ d3.csv("data.csv", function(data) {
   //for(var statename in dataAll){
   //dataArray.push(dataAll[statename]);
  // }
-  
+  var col1 =
   
 // Load GeoJSON data and merge with states data
-	d3.json("us-states.json", function(json) {
+	d3.json("us-states.json", function(error,json) {
 
 	json1 = json;
+	console.log("hi" + json);
+	console.log("hi" + error);
 
 // Loop through each state data value in the .csv file
-		for (var i = 0; i < data.length; i++) {
+	/*	for (var i = 0; i < data.length; i++) {
 
 		// Grab State Name
 		dataState = data[i].state;
@@ -318,9 +358,9 @@ d3.csv("data.csv", function(data) {
 		var dataValue = data[i].unemployment;
 
 		// Find the corresponding state inside the GeoJSON
-		for (var j = 0; j < json.features.length; j++)  {
+		for (var j = 0; j < `.features.length; j++)  {
 			 jsonState = json.features[j].properties.name;
-
+              
 			if (dataState == jsonState) {
 
 			// Copy the data value into the JSON
@@ -330,11 +370,11 @@ d3.csv("data.csv", function(data) {
 			break;
 			}
 			}//fill the states with csv value
-		}
+		}*/
 		
 // Bind the data to the SVG and create one path per GeoJSON feature
 	mapsvg.selectAll("path")
-			.data(json.features)
+			.data(json1.features)
 			.enter()
 			.append("path")
 			.attr("id", function(d) { return d.properties.name; })
@@ -345,6 +385,21 @@ d3.csv("data.csv", function(data) {
 			.style("stroke-width", "1")//remove this .style fill part and comment bellow
 			.style("fill", "#BDC3C7  ")
 			.on("mouseover", function(d) {
+			
+			var avg;
+			var state123 = d3.select(this).attr("id");
+			for(counter1 = 0; counter1< avgs.length; counter1++)
+			{
+				console.log("1", avgs[counter1].state );
+				console.log(state123);
+				if (avgs[counter1].state === state123 )
+				{
+					avg = avgs[counter1].avg;
+					console.log("3" + avg);	
+				}
+			
+			
+			}
 			div.transition()        
 				   .duration(200)      
 				   .style("opacity", .9);      
@@ -352,7 +407,7 @@ d3.csv("data.csv", function(data) {
 						 
 						d.properties.name +
 												  
-						"<br/>")	 
+						"<br/>"+ avg)	 
 				   .style("left", (d3.event.pageX) + "px")     
 				   .style("top", (d3.event.pageY - 28) + "px");    
 			})
@@ -363,14 +418,27 @@ d3.csv("data.csv", function(data) {
 				   .style("opacity", 0);   
 			})
 		.on("click", function(d){
+				//stateName = d3.select(this).attr("id");
 				toggleSelection(d.properties.name,d3.select(this));
 				svg.selectAll(".line")	
 				.attr("d",function(d1){
+				
+				/*lineColor = svg.select("#"+stateName).style("stroke");
+				console.log("4 " + lineColor);
+				
+				
+				console.log(stateName);*/
 				return isSelected(d1[0].State)?valueline(d1):null;
+				
+				
 				
 				})
 				.attr("clip-path","url(#clip)")
 				
+				/*
+				mapsvg.select("#" + stateName).style("fill", lineColor);
+				console.log("5");
+				*/
 			});
 
 	/* focus.append("path")
@@ -462,8 +530,9 @@ context.append("g")
 			}
 		if(!bexist){
 		selectedarray.push(statename);
-		e.style("fill","#DAF7A6");
-		
+		//e.style("fill","#DAF7A6");
+		lineColor = svg.select("#"+statename).style("stroke");
+		e.style("fill",lineColor);
 		}
 	}
 	function isSelected(statename){
@@ -505,9 +574,13 @@ context.append("g")
 	}
 	function clearAll(e){
 		{
-		svg.selectAll(".line")	
+		for(var i=0;i<selectedarray.length;i++){
+			var bexist=true;
+			selectedarray.splice(i,1);
+		      }
+		svg.selectAll(".line")
 				.attr("d",function(d1){
-				return null;
+				return null; 
 				
 				})
 		mapsvg.selectAll("path")
@@ -576,3 +649,8 @@ function type(d) {
 
 </body>
 </html>
+
+
+
+
+
